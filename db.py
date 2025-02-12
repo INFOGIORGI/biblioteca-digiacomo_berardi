@@ -1,6 +1,5 @@
-class DB:
-    
-    
+class db:
+
     app = Flask(__name__)
 
     app.config['MYSQL_HOST'] = '138.41.20.102'
