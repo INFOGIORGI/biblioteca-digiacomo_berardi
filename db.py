@@ -1,36 +1,50 @@
-class db:
+import json
+import datetime
 
-    app = Flask(__name__)
-
-    app.config['MYSQL_HOST'] = '138.41.20.102'
-    app.config['MYSQL_PORT'] = 53306
-    app.config['MYSQL_USER'] = 'ospite'
-    app.config['MYSQL_PASSWORD'] = 'ospite'
-    app.config['MYSQL_DB'] = 'digiacomo_berardi'
-    mysql = MySQL(app)
-
-    def creaLibro():
+def addProduct(mysql,productName,supplierID,price):
         cursor = mysql.connection.cursor()
-
-        query = """
-        CREATE TABLE IF NOT EXISTS Libro(
-            ISBN varchar(13),Titolo varchar (20),
-            Genere varchar (20),Prezzo float(2), 
-            Locazione varchar(20), Autore varchar(16), 
-            PRIMARY KEY (ISBN), 
-            FOREIGN KEY (Autore) REFERENCES Autore (CF))
-            """
-        cursor.execute(query)
+        query = '''SELECT * FROM suppliers WHERE supplierID=%s'''
+        cursor.execute(query,(supplierID,))
+        dati = cursor.fetchall() #torna il risultato della query
+        if len(dati)==0:
+            return False
+        query = '''INSERT INTO products(ProductName, SupplierID, Price) value(%s,%s,%s)'''
+        cursor.execute(query,(productName,supplierID,price))
+        mysql.connection.commit()
         cursor.close()
-        return
+        return True
 
-    def creaAutore():
-        cursor = mysql.connection.cursor()
+def allOrders(mysql):
+    cursor = mysql.connection.cursor()
+    query = '''SELECT * FROM orders'''
+    cursor.execute(query)
+    dati = cursor.fetchall()
+    cursor.close()
+    return dati
 
-        query = "CREATE TABLE Autore(Nome varchar (20),Cognome varchar(20),DataN date, DataM date,CF varchar(16), PRIMARY KEY (CF))"
-        cursor.execute(query)
-        cursor.close()
-        return
+def api_allOrders(mysql):
+    cursor = mysql.connection.cursor()
+    query = '''SELECT * FROM orders'''
+    cursor.execute(query)
+    row_headers=[x[0] for x in cursor.description]
+    #print(row_headers)
+    dati = cursor.fetchall()
+    json_data=[]
+    for result in dati:
+        json_data.append(dict(zip(row_headers,result)))
+    cursor.close()   
+    #print(json_data) 
+    return json.dumps(json_data,default=serialize_datetime)
 
-    if __name__ == "__main__":
-        app.run(debug = True)
+def serialize_datetime(obj): #per serializzare delle date
+    if isinstance(obj, datetime.date): 
+        return obj.isoformat() 
+    raise TypeError("Type not serializable") 
+
+def details(mysql, id):
+    cursor = mysql.connection.cursor()
+    query = '''SELECT * FROM orders WHERE customerID = %s'''
+    cursor.execute(query,(id,))
+    dati = cursor.fetchall()
+    cursor.close()
+    return dati
