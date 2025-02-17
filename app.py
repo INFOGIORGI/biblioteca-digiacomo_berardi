@@ -7,11 +7,11 @@ app = Flask(__name__)
 app.secret_key = "super secret key"
 
 
-app.config['MYSQL_HOST'] = ''
-app.config['MYSQL_PORT'] = 1
+app.config['MYSQL_HOST'] = '138.41.20.102'
+app.config['MYSQL_PORT'] = 53306
 app.config['MYSQL_USER'] = 'ospite'
 app.config['MYSQL_PASSWORD'] = 'ospite'
-app.config['MYSQL_DB'] = 'w3schools'
+app.config['MYSQL_DB'] = 'digiacomo_berardi'
 mysql = MySQL(app)
 
 
@@ -53,5 +53,17 @@ def details(id):
 @app.route("/api/orders/")
 def api_orders():
     return db.api_allOrders(mysql)
+
+@app.route("/createAutore/")
+def createAutore():
+    return db.createAutore(mysql)
+
+@app.route("/createLibro/")
+def createLibro():
+    return db.createLibro(mysql)
+
+@app.route("/addLibro/")
+def addLibro():
+    return db.addLibro(mysql)
 
 app.run(debug=True)

@@ -1,19 +1,6 @@
 import json
 import datetime
 
-def addProduct(mysql,productName,supplierID,price):
-        cursor = mysql.connection.cursor()
-        query = '''SELECT * FROM suppliers WHERE supplierID=%s'''
-        cursor.execute(query,(supplierID,))
-        dati = cursor.fetchall() #torna il risultato della query
-        if len(dati)==0:
-            return False
-        query = '''INSERT INTO products(ProductName, SupplierID, Price) value(%s,%s,%s)'''
-        cursor.execute(query,(productName,supplierID,price))
-        mysql.connection.commit()
-        cursor.close()
-        return True
-
 def allOrders(mysql):
     cursor = mysql.connection.cursor()
     query = '''SELECT * FROM orders'''
@@ -48,3 +35,51 @@ def details(mysql, id):
     dati = cursor.fetchall()
     cursor.close()
     return dati
+
+def createAutore(mysql):
+    cursor = mysql.connection.cursor()
+
+    query = """
+    CREATE TABLE IF NOT EXISTS Autore(
+        Nome varchar (20),
+        Cognome varchar(20),
+        DataN date, 
+        DataM date,
+        CF varchar(16), 
+        
+        PRIMARY KEY (CF))
+        """
+    cursor.execute(query)
+    cursor.close()
+    
+    return
+        
+def createLibro(mysql):
+    cursor = mysql.connection.cursor()
+
+    query = """
+    CREATE TABLE IF NOT EXISTS Libro(
+        ISBN varchar(13),
+        Titolo varchar (20),
+        Genere varchar (20),
+        Prezzo float(2), 
+        Locazione varchar(20), 
+        Autore varchar(16), 
+        
+        PRIMARY KEY (ISBN), 
+        FOREIGN KEY (Autore) REFERENCES Autore (CF))
+        """
+    cursor.execute(query)
+    cursor.close()
+
+    return
+
+def addLibro(mysql):
+    cursor = mysql.connection.cursor()
+    
+    query = """
+    
+    """
+    
+    cursor.execute(query)
+    cursor.close()
