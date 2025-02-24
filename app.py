@@ -9,8 +9,8 @@ app.secret_key = "super secret key"
 
 app.config['MYSQL_HOST'] = '138.41.20.102'
 app.config['MYSQL_PORT'] = 53306
-app.config['MYSQL_USER'] = 'ospite'
-app.config['MYSQL_PASSWORD'] = 'ospite'
+app.config['MYSQL_USER'] = '5di'
+app.config['MYSQL_PASSWORD'] = 'colazzo'
 app.config['MYSQL_DB'] = 'digiacomo_berardi'
 mysql = MySQL(app)
 
@@ -62,8 +62,24 @@ def createAutore():
 def createLibro():
     return db.createLibro(mysql)
 
-@app.route("/addLibro/")
+@app.route("/addLibro/",methods=["GET","POST"])
 def addLibro():
-    return db.addLibro(mysql)
-
+    if request.method == 'GET':
+        return render_template("addLibro.html",titolo="AddLibro")
+    else:
+        isbn = request.form.get("isbn",)
+        titolo = request.form.get("titolo",)
+        genere = request.form.get("genere",)
+        prezzo = request.form.get("prezzo",)
+        locazione = request.form.get("locazione",)
+        autore = request.form.get("autore",)
+        
+        e = db.addLibro(mysql,isbn,titolo,genere,prezzo,locazione,autore)
+        if not e:
+            flash("Supplier ID does not exist.")
+            return redirect(url_for('addLibro'))
+        else:
+            flash("Product added successfully.")
+            return redirect(url_for('addLibro'))
+            
 app.run(debug=True)

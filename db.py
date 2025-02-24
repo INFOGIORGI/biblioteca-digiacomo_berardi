@@ -74,8 +74,16 @@ def createLibro(mysql):
 
     return
 
-def addLibro(mysql):
+def addLibro(mysql,isbn,titolo,genere,prezzo,locazione,autore):
     cursor = mysql.connection.cursor()
+    
+    query = "SELECT * FROM AUTORE WHERE CF = %s"
+    cursor.execute(query, (autore,))
+    ris = cursor.fetchall()
+    
+    if len(ris)==0:
+        return False
+
     
     query = """
     
@@ -83,3 +91,4 @@ def addLibro(mysql):
     
     cursor.execute(query)
     cursor.close()
+    return True

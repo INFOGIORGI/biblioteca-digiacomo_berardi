@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block titolo %}
+Aggiungi libro
+{% endblock %}
+
+{% block intestazione %}Aggiungi libro{% endblock %}
+{% block corpo %}
+<form action="/addLibro/" method="POST">
+    <h3>ISBN</h3>
+    <input type="text" name = "isbn">
+    <h3>Titolo</h3>
+    <input type="text" name = "titolo">
+    <h3>Genere</h3>
+    <input type="text" name = "genere">
+    <h3>Prezzo</h3>
+    <input type="number" name = "prezzo">
+    <h3>Locazione</h3>
+    <input type="text" name = "locazione">
+    <h3>Autore</h3>
+    <input type="text" name = "autore">
+    <br>
+    <br>
+    <input type="submit" value = "Aggiungi">
+</form>
+
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+    {% for message in messages %}
+        <h1>{{ message }}</h1>
+    {% endfor %}
+{% endif %}
+{% endwith %}
+{% endblock %}
