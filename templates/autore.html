@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block titolo %}
+Dettagli Autore
+{% endblock %}
+
+{% block intestazione %}
+{% endblock %}
+
+{% block corpo %}
+    <div class="intro">
+        <h2>Autore: {{ autore[1] }} {{ autore[2] }}</h2>
+        <p><strong>Data di Nascita:</strong> {{ autore[3] }}</p>
+        <p><strong>Data di Morte:</strong> {% if autore[4] %} {{ autore[4] }} {% else %} Vivo {% endif %}</p>
+    </div>
+    
+    <div class="section-cta">
+        <h3>Libri Scritti:</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>ISBN</th>
+                    <th>Titolo</th>
+                    <th>Genere</th>
+                    <th>Prezzo</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for libro in libri %}
+                <tr>
+                    <td>{{ libro[0] }}</td>
+                    <td>{{ libro[1] }}</td>
+                    <td>{{ libro[2] }}</td>
+                    <td>{{ libro[3] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

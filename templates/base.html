@@ -2,10 +2,23 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <title>{% block titolo%}{% endblock %}</title>
+  <title>{% block titolo %}{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
+  <nav>
+    <a href="/" {% if request.endpoint=='home' %}class="active" {% endif %}>Home</a>
+    <a href="/catalogo/" {% if request.endpoint=='catalogo' %}class="active" {% endif %}>Catalogo</a>
+    <a href="/addLibro/" {% if request.endpoint=='addLibro' %}class="active" {% endif %}>Aggiungi Libro</a>
+    <a href="/addAutore/" {% if request.endpoint=='addAutore' %}class="active" {% endif %}>Aggiungi Autore</a>
+  </nav>
+
   <h1>{% block intestazione %}{% endblock %}</h1>
+
   <p>{% block corpo %}{% endblock %}</p>
+
+  <footer>
+    <p>&copy; PCTO INMATICA GRUPPO DI GIACOMO - BERARDI</p>
+  </footer>
 </body>
 </html>

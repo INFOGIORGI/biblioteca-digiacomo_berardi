@@ -1,41 +1,58 @@
 {% extends 'base.html' %}
+
 {% block titolo %}
 Catalogo
 {% endblock %}
 
-{% block intestazione %}Catalogo{% endblock %}
-{% block corpo %}
+{% block intestazione %}
+Catalogo
+{% endblock %}
 
-<table class="table table-striped">
-    <thead class="table-dark">
-        <tr>
-            <th>ISBN</th>
-            <th>Titolo</th>
-            <th>Genere</th>
-            <th>Prezzo</th>
-            <th>Locazione</th>
-            <th>Autore</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for libro in libri%}
-        <tr>
-            <td>{{ libro.ISBN }}</td>
-            <td>{{ libro.Titolo }}</td>
-            <td>{{ libro.Genere }}</td>
-            <td>{{ libro.Prezzo }}</td>
-            <td>{{ libro.Locazione }}</td>
-            <td>{{ libro.Autore }}</td>
-        </tr>
+{% block corpo %}
+  
+<!-- Form di ricerca centrato -->
+<form method="POST" action="/catalogo/" class="form-search">
+    <input type="text" name="filtro" placeholder="Cerca libro..." />
+    <input type="submit" value="Filtra" />
+</form>
+
+<form>
+    <label for="genere">Seleziona il genere</label>
+    <select name="genere" id="genere" onchange="this.form.submit()">
+        <option value="">Tutti i generi</option>
+        {% for genere in generi %}
+        <option value="{{ genere }}" {% if genere==request.args.get('genere') %}selected{% endif %}>{{ genere }}</option>
         {% endfor %}
-    </tbody>
+    </select>
+</form>
+
+<table>
+    <tr>
+        <th>ISBN</th>
+        <th><a href="{{ url_for('catalogo', order_by='Titolo')}}">Titolo</a></th>
+        <th>Genere</th>
+        <th>Prezzo</th>
+        <th>Locazione</th>
+        <th><a href="{{ url_for('catalogo', order_by='Autore')}}">Autore</a></th>
+    </tr>
+    {% for libro in libri %}
+    <tr>
+        <td>{{ libro[0] }}</td>
+        <td>{{ libro[1] }}</td>
+        <td>{{ libro[2] }}</td>
+        <td>{{ libro[3] }}</td>
+        <td>{{ libro[4] }}</td>
+        <td><a href="{{ url_for('autore', cf=libro[5]) }}">{{ libro[5] }}</a></td>
+    </tr>
+    {% endfor %}
 </table>
 
 {% with messages = get_flashed_messages() %}
 {% if messages %}
-    {% for message in messages %}
-        <h1>{{ message }}</h1>
-    {% endfor %}
+{% for message in messages %}
+<h1>{{ message }}</h1>
+{% endfor %}
 {% endif %}
 {% endwith %}
+
 {% endblock %}

@@ -1,0 +1,170 @@
+/* Reset generale per tutti gli elementi */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f9f9f9;
+    /* Colore di sfondo chiaro */
+    color: #333;
+    /* Colore del testo principale */
+    line-height: 1.6;
+}
+
+h1,
+h2,
+h3 {
+    color: #333;
+    /* Colore dei titoli scuro */
+}
+
+a {
+    text-decoration: none;
+    color: #000;
+    /* Colore dei link */
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: #3498db;
+    /* Colore dei link al passaggio del mouse */
+}
+
+nav {
+    background-color: #000;
+    /* Sfondo nero della navbar */
+    padding: 10px 20px;
+    text-align: center;
+}
+
+nav a {
+    color: #fff;
+    /* Colore dei link nella navbar */
+    margin: 0 15px;
+    padding: 10px 20px;
+    font-size: 18px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+nav a:hover {
+    background-color: #3498db;
+    /* Colore di sfondo dei link al passaggio del mouse */
+    color: #fff;
+}
+
+/* Stile specifico per la pagina dell'autore */
+.intro {
+    background-color: #f4f4f9;
+    padding: 40px 20px;
+    text-align: center;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin: 30px auto;
+    max-width: 800px;
+}
+
+.intro h2 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.intro p {
+    font-size: 1.2rem;
+    color: #555;
+    line-height: 1.6;
+}
+
+.section-cta {
+    text-align: center;
+    margin-top: 40px;
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.section-cta h3 {
+    font-size: 2rem;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+table {
+    width: 90%;
+    margin-top: 20px;
+    margin-left: auto;
+    margin-right: auto;
+    border-collapse: collapse;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+table th,
+table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+table th {
+    background-color: #000;
+    color: #fff;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+table th a {
+    color: #fff;
+    text-decoration: none;
+}
+
+table th a:hover {
+    color: #3498db;
+}
+
+table td {
+    background-color: #fff;
+}
+
+table tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Aggiustamenti per dispositivi mobili */
+@media (max-width: 768px) {
+    .intro h2 {
+        font-size: 2rem;
+    }
+
+    .section-cta h3 {
+        font-size: 1.5rem;
+    }
+
+    table {
+        width: 100%;
+    }
+
+    table th,
+    table td {
+        padding: 10px;
+    }
+}
+
+footer {
+    background-color: #000;
+    color: #fff;
+    text-align: center;
+    padding: 20px;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+}
+
+footer p {
+    margin: 0;
+}

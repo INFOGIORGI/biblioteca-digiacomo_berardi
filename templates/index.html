@@ -1,10 +1,22 @@
 {% extends 'base.html' %}
+
 {% block titolo %}
 Home
 {% endblock %}
 
-{% block intestazione %}Home page{% endblock %}
-{% block corpo %}
-{{ message }}
-<h2><a href="{{url_for('addAutore')}}">Utenti</a></h2>
+{% block intestazione %}
 {% endblock %}
+
+{% block corpo %}
+<div class="intro">
+    <div class="container">
+        <h2>Il nostro progetto PCTO: Una Biblioteca Digitale</h2>
+        <p>Benvenuti nel progetto PCTO che mira a realizzare il sito web di una biblioteca, in collaborazione con <strong>Inmatica</strong>. Un percorso che ci vede impegnati nella creazione di una piattaforma innovativa e accessibile per tutti gli utenti, che vogliono scoprire e godere dei benefici di un'archiviazione digitale dei libri e delle risorse della biblioteca.</p>
+        <p>Durante questo percorso, ci stiamo concentrando sul miglioramento dell'esperienza utente e sull'ottimizzazione della gestione della biblioteca. Il sito permetterà agli utenti di cercare, esplorare, e prenotare libri, con una struttura moderna, responsiva, e facile da navigare.</p>
+        <p>Inmatica, il nostro partner tecnologico, ci sta supportando con la sua esperienza nel mondo digitale e nella creazione di soluzioni web innovative. Insieme, stiamo costruendo una piattaforma che rappresenterà il futuro della gestione bibliotecaria.</p>
+        <p>Esplora il nostro sito e segui il nostro progresso mentre continuiamo a lavorare per offrire un servizio migliore per tutti!</p>
+    </div>
+</div>
+
+{% endblock %}
+

@@ -20,40 +20,6 @@ mysql = MySQL(app)
 def home():
     return render_template("index.html",titolo="Home")
 
-@app.route("/addProduct/",methods=["GET","POST"])
-def addProduct():
-    if request.method == 'GET':
-        return render_template("addProduct.html",titolo="Add")
-    else:
-        productName = request.form.get("productName","")
-        supplierID = request.form.get("supplierID","")
-        price = request.form.get("price","")
-
-        if productName=="" or supplierID=="" or price=="":
-            flash("It is necessary to fill in all the fields.")
-            return redirect(url_for('addProduct'))
-        
-        e = db.addProduct(mysql,productName,supplierID,price)
-        if not e:
-            flash("Supplier ID does not exist.")
-            return redirect(url_for('addProduct'))
-        flash("Product added successfully.")
-        return redirect(url_for('addProduct'))
-
-@app.route("/orders/")
-def orders():
-    return render_template("orders.html",orders=db.allOrders(mysql),titolo="Orders")
-       
-
-
-@app.route("/details/<id>")
-def details(id):
-    return render_template("orders.html",orders=db.details(id),titolo="Details",extra = "for customerID "+id)
-       
-@app.route("/api/orders/")
-def api_orders():
-    return db.api_allOrders(mysql)
-
 @app.route("/createAutore/")
 def createAutore():
     return db.createAutore(mysql)
@@ -103,6 +69,46 @@ def addAutore():
 
 @app.route("/catalogo/",methods=["GET","POST"])
 def catalogo():
-    return render_template("catalogo.html",libri=db.catalogo(mysql),titolo = "Catalogo")
+    if request.method == 'GET':
+        order_by = request.args.get('order_by', None)
+        genere = request.args.get('genere', None)
+        
+        query = "SELECT * FROM Libro"
+        parametri = []
+        
+        if order_by:
+            query += f" ORDER BY {order_by}"
+        
+        if genere:
+            query += " WHERE Genere = %s"
+            parametri.append(genere)
             
+        libri = db.catalogo(mysql, query, tuple(parametri))
+        generi = db.getGeneri(mysql)
+            
+        return render_template("catalogo.html",libri=libri, generi = generi, titolo = "Catalogo")
+    else:
+        filtro = request.form.get("filtro","")
+        query = "SELECT * FROM Libro"
+        
+        if filtro:
+            query += " WHERE LOWER(Titolo) LIKE %s OR LOWER(Autore) LIKE %s OR ISBN LIKE %s"
+            param_filtro = f"%{filtro.lower()}%" #doppia percentuale cerca il filtro in mezzo ad altre parole
+            libriFiltrati = db.catalogo(mysql, query, (param_filtro, param_filtro, param_filtro))
+        else:
+            libriFiltrati = db.catalogo(mysql)
+            
+        return render_template("catalogo.html",libri=libriFiltrati,titolo="Catalogo")
+
+@app.route("/autore/<cf>")
+def autore(cf):
+    autore = db.getAutore(mysql,cf)
+    libri_autore = db.getLibriAutore(mysql,cf)
+    
+    if autore:
+        return render_template("autore.html", autore=autore, libri=libri_autore)
+    else:
+        return "Autore non trovato", 404
+
+        
 app.run(debug=True)
