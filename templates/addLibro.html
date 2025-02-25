@@ -5,6 +5,14 @@ Aggiungi libro
 
 {% block intestazione %}Aggiungi libro{% endblock %}
 {% block corpo %}
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+{% for message in messages %}
+<h1>{{ message }}</h1>
+{% endfor %}
+{% endif %}
+{% endwith %}
+
 <form action="/addLibro/" method="POST">
     <h3>ISBN</h3>
     <input type="text" name="isbn">
@@ -22,12 +30,4 @@ Aggiungi libro
     <br>
     <input type="submit" value="Aggiungi">
 </form>
-
-{% with messages = get_flashed_messages() %}
-{% if messages %}
-{% for message in messages %}
-<h1>{{ message }}</h1>
-{% endfor %}
-{% endif %}
-{% endwith %}
 {% endblock %}

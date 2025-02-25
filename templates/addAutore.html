@@ -5,6 +5,14 @@ Aggiungi autore
 
 {% block intestazione %}Aggiungi autore{% endblock %}
 {% block corpo %}
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+{% for message in messages %}
+<h1>{{ message }}</h1>
+{% endfor %}
+{% endif %}
+{% endwith %}
+
 <form action="/addAutore/" method="POST">
     <h3>Nome</h3>
     <input type="text" name="nome">
@@ -20,12 +28,4 @@ Aggiungi autore
     <br>
     <input type="submit" value="Aggiungi">
 </form>
-
-{% with messages = get_flashed_messages() %}
-{% if messages %}
-{% for message in messages %}
-<h1>{{ message }}</h1>
-{% endfor %}
-{% endif %}
-{% endwith %}
 {% endblock %}
