@@ -41,11 +41,11 @@ def createAutore(mysql):
 
     query = """
     CREATE TABLE IF NOT EXISTS Autore(
-        Nome varchar (20),
-        Cognome varchar(20),
-        DataN date, 
-        DataM date,
+        Nome varchar (20) NOT NULL,
+        Cognome varchar(20) NOT NULL,
         CF varchar(16), 
+        DataN date NOT NULL, 
+        DataM date,
         
         PRIMARY KEY (CF))
         """
@@ -60,8 +60,8 @@ def createLibro(mysql):
     query = """
     CREATE TABLE IF NOT EXISTS Libro(
         ISBN varchar(13),
-        Titolo varchar (20),
-        Genere varchar (20),
+        Titolo varchar (20) NOT NULL,
+        Genere varchar (20) NOT NULL,
         Prezzo float(2), 
         Locazione varchar(20), 
         Autore varchar(16), 
@@ -77,18 +77,53 @@ def createLibro(mysql):
 def addLibro(mysql,isbn,titolo,genere,prezzo,locazione,autore):
     cursor = mysql.connection.cursor()
     
-    query = "SELECT * FROM AUTORE WHERE CF = %s"
+    query = "SELECT * FROM Autore WHERE CF = %s"
     cursor.execute(query, (autore,))
     ris = cursor.fetchall()
     
     if len(ris)==0:
         return False
 
+    prezzo = None if prezzo == "" else prezzo
     
     query = """
-    
+    INSERT INTO Libro 
+    VALUES (%s,%s,%s,%s,%s,%s)
     """
     
-    cursor.execute(query)
+    cursor.execute(query, (isbn,titolo,genere,prezzo,locazione,autore))
+    mysql.connection.commit()
+    
     cursor.close()
     return True
+
+def addAutore(mysql,nome,cognome,cf,ddn,ddm):
+    cursor = mysql.connection.cursor()
+    
+    query = "SELECT * FROM Autore WHERE CF = %s"
+    cursor.execute(query, (cf,))
+    ris = cursor.fetchall()
+    
+    if len(ris)!=0:
+        return False
+
+    ddm = None if ddm == "" else ddm
+    
+    query = """
+    INSERT INTO Autore 
+    VALUES (%s,%s,%s,%s,%s)
+    """
+    
+    cursor.execute(query, (nome,cognome,cf,ddn,ddm))
+    mysql.connection.commit()
+    cursor.close()
+    return True
+
+def catalogo(mysql):
+    cursor = mysql.connection.cursor()
+    query = "SELECT * FROM Libro"
+    cursor.execute(query)
+    libri = cursor.fetchall()
+    cursor.close()
+    return libri
+

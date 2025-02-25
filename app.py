@@ -76,10 +76,33 @@ def addLibro():
         
         e = db.addLibro(mysql,isbn,titolo,genere,prezzo,locazione,autore)
         if not e:
-            flash("Supplier ID does not exist.")
+            flash("Autore inesistente.")
             return redirect(url_for('addLibro'))
         else:
-            flash("Product added successfully.")
+            flash("Libro aggiunto con successo.")
             return redirect(url_for('addLibro'))
+
+@app.route("/addAutore/",methods=["GET","POST"])
+def addAutore():
+    if request.method == 'GET':
+        return render_template("addAutore.html",titolo="AddLibro")
+    else:
+        nome = request.form.get("nome",)
+        cognome = request.form.get("cognome",)
+        cf = request.form.get("cf",)
+        ddn = request.form.get("ddn",)
+        ddm = request.form.get("ddm",)
+        
+        e = db.addAutore(mysql,nome,cognome,cf,ddn,ddm)
+        if not e:
+            flash("Autore già esistente.")
+            return redirect(url_for('addAutore'))
+        else:
+            flash("Autore aggiunto con successo.")
+            return redirect(url_for('addAutore'))
+
+@app.route("/catalogo/",methods=["GET","POST"])
+def catalogo():
+    return render_template("catalogo.html",libri=db.catalogo(mysql),titolo = "Catalogo")
             
 app.run(debug=True)

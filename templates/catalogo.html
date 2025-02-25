@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block titolo %}
+Catalogo
+{% endblock %}
+
+{% block intestazione %}Catalogo{% endblock %}
+{% block corpo %}
+
+<table class="table table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>ISBN</th>
+            <th>Titolo</th>
+            <th>Genere</th>
+            <th>Prezzo</th>
+            <th>Locazione</th>
+            <th>Autore</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for libro in libri%}
+        <tr>
+            <td>{{ libro.ISBN }}</td>
+            <td>{{ libro.Titolo }}</td>
+            <td>{{ libro.Genere }}</td>
+            <td>{{ libro.Prezzo }}</td>
+            <td>{{ libro.Locazione }}</td>
+            <td>{{ libro.Autore }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+    {% for message in messages %}
+        <h1>{{ message }}</h1>
+    {% endfor %}
+{% endif %}
+{% endwith %}
+{% endblock %}
