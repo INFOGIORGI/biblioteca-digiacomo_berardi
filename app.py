@@ -30,7 +30,7 @@ def createLibro():
 
 @app.route("/addLibro/",methods=["GET","POST"])
 def addLibro():
-    if request.method == 'GET':
+    if request.method == 'GET': 
         return render_template("addLibro.html",titolo="AddLibro")
     else:
         isbn = request.form.get("isbn",)
