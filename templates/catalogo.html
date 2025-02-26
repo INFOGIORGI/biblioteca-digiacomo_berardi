@@ -42,7 +42,7 @@ Catalogo
         <td>{{ libro[2] }}</td>
         <td>{{ libro[3] }}</td>
         <td>{{ libro[4] }}</td>
-        <td><a href="{{ url_for('autore', cf=libro[5]) }}">{{ libro[5] }}</a></td>
+        <td><a id="cf" href="{{ url_for('autore', cf=libro[5]) }}">{{ libro[5] }}</a></td>
     </tr>
     {% endfor %}
 </table>

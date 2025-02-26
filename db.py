@@ -111,3 +111,20 @@ def getLibriAutore(mysql,cf):
     libri_autore = cursor.fetchall()
     cursor.close()
     return libri_autore
+
+def addQuery():
+    query = "SELECT * FROM Libro" 
+    return query
+
+def addOrdinamento(order_by):
+    query = f" ORDER BY {order_by}"
+    return query
+
+def filtraGenere(parametri,genere):
+    query = " WHERE Genere = %s"
+    parametri.append(genere)
+    return query
+            
+def addFiltro(query):
+    query = " WHERE LOWER(Titolo) LIKE %s OR LOWER(Autore) LIKE %s OR ISBN LIKE %s"
+    return query

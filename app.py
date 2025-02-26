@@ -72,27 +72,25 @@ def catalogo():
     if request.method == 'GET':
         order_by = request.args.get('order_by', None)
         genere = request.args.get('genere', None)
-        
-        query = "SELECT * FROM Libro"
         parametri = []
+        query = db.addQuery()
         
         if order_by:
-            query += f" ORDER BY {order_by}"
-        
-        if genere:
-            query += " WHERE Genere = %s"
-            parametri.append(genere)
+            query += db.addOrdinamento(order_by)
             
+        if genere:
+            query += db.filtraGenere(parametri,genere)
+                    
         libri = db.catalogo(mysql, query, tuple(parametri))
         generi = db.getGeneri(mysql)
             
         return render_template("catalogo.html",libri=libri, generi = generi, titolo = "Catalogo")
     else:
         filtro = request.form.get("filtro","")
-        query = "SELECT * FROM Libro"
+        query = db.addQuery()
         
         if filtro:
-            query += " WHERE LOWER(Titolo) LIKE %s OR LOWER(Autore) LIKE %s OR ISBN LIKE %s"
+            query += db.addFiltro(query)
             param_filtro = f"%{filtro.lower()}%" #doppia percentuale cerca il filtro in mezzo ad altre parole 
             libriFiltrati = db.catalogo(mysql, query, (param_filtro, param_filtro, param_filtro))
         else:

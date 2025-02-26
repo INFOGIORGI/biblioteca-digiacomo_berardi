@@ -23,7 +23,7 @@ h3 {
 
 a {
     text-decoration: none;
-    color: #000;
+    color: #ffffff;
     /* Colore dei link */
     transition: color 0.3s ease;
 }
@@ -164,6 +164,18 @@ footer {
     text-align: center;
     padding: 20px;
     position: fixed;
+    bottom: 0;
+    width: 100%;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.catalogo footer {
+    background-color: #000;
+    /* Sfondo footer nero */
+    color: #fff;
+    text-align: center;
+    padding: 20px;
+    position: absolute;
     bottom: 0;
     width: 100%;
     box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
@@ -334,4 +346,11 @@ footer p {
 .section-cta .btn:hover {
     background-color: #2980b9;
     color: #fff;
+}
+
+#cf {
+    text-decoration: none;
+    color: #000000;
+    /* Colore dei link */
+    transition: color 0.3s ease;
 }
