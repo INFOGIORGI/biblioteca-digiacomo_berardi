@@ -5,35 +5,39 @@ Catalogo
 {% endblock %}
 
 {% block intestazione %}
-Catalogo
 {% endblock %}
 
 {% block corpo %}
-  
+
 <!-- Form di ricerca centrato -->
 <form method="POST" action="/catalogo/" class="form-search">
     <input type="text" name="filtro" placeholder="Cerca libro..." />
     <input type="submit" value="Filtra" />
 </form>
 
+<!-- Form per selezionare il genere -->
 <form>
     <label for="genere">Seleziona il genere</label>
     <select name="genere" id="genere" onchange="this.form.submit()">
         <option value="">Tutti i generi</option>
         {% for genere in generi %}
-        <option value="{{ genere }}" {% if genere==request.args.get('genere') %}selected{% endif %}>{{ genere }}</option>
+        <option value="{{ genere }}" {% if genere==request.args.get('genere') %}selected{% endif %}>{{ genere }}
+        </option>
         {% endfor %}
     </select>
 </form>
 
+<!-- Tabella con i libri -->
 <table>
     <tr>
         <th>ISBN</th>
-        <th><a href="{{ url_for('catalogo', order_by='Titolo')}}">Titolo</a></th>
+        <th><a href="{{ url_for('catalogo', order_by='Titolo') }}", style="color: rgb(255, 255, 255)">Titolo</a></th>
         <th>Genere</th>
         <th>Prezzo</th>
         <th>Locazione</th>
-        <th><a href="{{ url_for('catalogo', order_by='Autore')}}">Autore</a></th>
+        <th><a href="{{ url_for('catalogo', order_by='Autore') }}", style="color: rgb(255, 255, 255)";>Autore</a></th>
+        <th>Disponibilità</th>
+        <th>Riassunto</th>
     </tr>
     {% for libro in libri %}
     <tr>
@@ -42,17 +46,100 @@ Catalogo
         <td>{{ libro[2] }}</td>
         <td>{{ libro[3] }}</td>
         <td>{{ libro[4] }}</td>
-        <td><a id="cf" href="{{ url_for('autore', cf=libro[5]) }}">{{ libro[5] }}</a></td>
+        <td><a href="{{ url_for('autore', cf=libro[5]) }}">{{ libro[5] }}</a></td>
+        <td>
+            {% if libro[6] == 1 %}
+            {% if session.get('user_id') %}
+            <a href="{{ url_for('prestito', isbn=libro[0]) }}" style="color: green;">Disponibile</a>
+            {% else %}
+            <span style="color: green;">Disponibile</span>
+            {% endif %}
+            {% else %}
+            <span style="color: red;">Non disponibile</span>
+            {% endif %}
+        </td>
+        <td>
+            <button class="info-icon" onclick="openModal('{{ libro[0] }}')">📚</button>
+        </td>
     </tr>
     {% endfor %}
 </table>
 
-{% with messages = get_flashed_messages() %}
-{% if messages %}
-{% for message in messages %}
-<h1>{{ message }}</h1>
-{% endfor %}
-{% endif %}
-{% endwith %}
+<!-- Modale -->
+<div id="bookSummaryModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">×</span>
+        <h2 id="book-summary-title">Titolo del Libro</h2>
+        <p id="book-summary">Testo del riassunto del libro...</p>
+        <button id="aggiungiRiassuntoBtn" onclick="showForm()">Aggiungi Riassunto</button>
+        <form id="formRiassunto" style="display:none;" method="POST" action="/aggiungi_riassunto">
+            <input type="hidden" id="isbnRiassunto" name="isbn">
+            <label for="titoloRiassunto">Titolo:</label>
+            <input type="text" id="titoloRiassunto" name="titoloRiassunto" placeholder="Inserisci titolo del riassunto"
+                required>
+            <label for="testoRiassunto">Riassunto:</label>
+            <textarea id="testoRiassunto" name="testoRiassunto" rows="5" required></textarea>
+            <button type="submit">Salva Riassunto</button>
+        </form>
+    </div>
+</div>
+
+<!-- Flash messages -->
+<div class="flash-message-container">
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <div class="flash-message alert alert-info">
+        {% for message in messages %}
+        <p>{{ message }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+</div>
+</div>
+
+<br>
+
+<script>
+    function openModal(isbn) {
+        document.getElementById('bookSummaryModal').style.display = 'block';
+        document.getElementById('isbnRiassunto').value = isbn;
+
+        fetch(`/get_riassunto/${isbn}`)
+            .then(response => {
+                if (!response.ok) throw new Error("Errore");
+                return response.json();
+            })
+            .then(data => {
+                const summaryElement = document.getElementById('book-summary');
+                const titleElement = document.getElementById('book-summary-title');
+                const addButton = document.getElementById('aggiungiRiassuntoBtn');
+
+                if (data.riassunto && data.riassunto !== 'Riassunto non disponibile') {
+                    summaryElement.textContent = data.riassunto;
+                    titleElement.textContent = data.titolo || "Titolo non disponibile";
+                    addButton.style.display = 'none';
+                } else {
+                    summaryElement.textContent = 'Riassunto non disponibile.';
+                    titleElement.textContent = "Titolo non disponibile";
+                    addButton.style.display = 'block';
+                }
+            })
+            .catch(error => {
+                console.error(error);
+                document.getElementById('book-summary').textContent = 'Errore nel caricamento.';
+                document.getElementById('book-summary-title').textContent = 'Errore nel caricamento.';
+                document.getElementById('aggiungiRiassuntoBtn').style.display = 'block';
+            });
+    }
+
+    function closeModal() {
+        document.getElementById('bookSummaryModal').style.display = 'none';
+    }
+
+    function showForm() {
+        document.getElementById('formRiassunto').style.display = 'block';
+    }
+</script>
 
 {% endblock %}

@@ -10,6 +10,7 @@ def createAutore(mysql):
         DataM date,
         
         PRIMARY KEY (CF))
+    )
         """
     cursor.execute(query)
     cursor.close()
@@ -27,14 +28,56 @@ def createLibro(mysql):
         Prezzo float(2), 
         Locazione varchar(20), 
         Autore varchar(16), 
+        Disponibilità boolean,
+        titoloRiassunto varchar(20),
+        riassunto varchar(1000),
         
         PRIMARY KEY (ISBN), 
         FOREIGN KEY (Autore) REFERENCES Autore (CF))
+    )
         """
     cursor.execute(query)
     cursor.close()
 
     return
+
+def createUtente(mysql):
+    cursor = mysql.connection.cursor()
+    
+    query = """
+        CREATE TABLE IF NOT EXISTS Utente(
+            nome varchar(20) NOT NULL,
+            cognome varchar (20) NOT NULL,
+            username varchar (20) NOT NULL,
+            password varchar (255) NOT NULL,
+            ddn date NOT NULL,
+
+            PRIMARY KEY(username)
+        )
+        """
+    
+    cursor.execute(query)
+    cursor.close
+    
+def createPrestito(mysql):
+    cursor = mysql.connection.cursor()
+    
+    query = """
+       CREATE TABLE IF NOT EXISTS Prestito(
+            ISBN varchar(13),
+            utente varchar(20),
+            dataInizio date NOT NULL,
+            dataFine date NOT NULL,
+            idPrestito int NOT NULL AUTO_INCREMENT,
+        
+            FOREIGN KEY(ISBN) references Libro(ISBN),
+            FOREIGN KEY(utente) references Utente(username),
+            PRIMARY KEY(idPrestito)
+        )
+        """
+    
+    cursor.execute(query)
+    cursor.close
 
 def addLibro(mysql,isbn,titolo,genere,prezzo,locazione,autore):
     cursor = mysql.connection.cursor()
@@ -128,3 +171,143 @@ def filtraGenere(parametri,genere):
 def addFiltro(query):
     query = " WHERE LOWER(Titolo) LIKE %s OR LOWER(Autore) LIKE %s OR ISBN LIKE %s"
     return query
+
+def valida_password(re,password,confirmPassword):
+    """ Verifica se la password rispetta i vincoli di sicurezza """
+    if len(password) < 8:
+        return "La password deve contenere almeno 8 caratteri."
+    if not re.search(r"\d", password):
+        return "La password deve contenere almeno un numero."
+    if not re.search(r"[!@#$%^&*(),.?\":{}|<>]", password):
+        return "La password deve contenere almeno un carattere speciale (!@#$%^&* etc.)."
+    if password != confirmPassword:
+        return "Le password non coincidono"
+    return None
+
+def registrati(mysql,nome,cognome,username,password_hash,ddn):
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT * FROM Utente WHERE username = %s", (username,))
+    existing_user = cur.fetchone()
+
+    if existing_user:
+        return False
+    
+    cur.execute("INSERT INTO Utente (nome, cognome, username, password, ddn) VALUES (%s, %s, %s, %s, %s)",
+                (nome, cognome, username, password_hash, ddn))
+    mysql.connection.commit()
+    cur.close()
+
+def get_utente_by_username(mysql, username):
+    cursor = mysql.connection.cursor()
+    query = "SELECT * FROM Utente WHERE username = %s"
+    cursor.execute(query, (username,))
+    user = cursor.fetchone()
+    cursor.close()
+    return user
+
+def get_utente_by_cf(mysql, cf):
+    cursor = mysql.connection.cursor()
+    query = "SELECT * FROM Utenti WHERE CF = ?"
+    result = cursor.execute(query, (cf,))
+    return result[0] if result else None
+
+def get_libro_by_isbn(mysql, isbn):
+    cursor = mysql.connection.cursor()
+    query = "SELECT * FROM Libro WHERE ISBN = %s"  # Corretto: cambia ? con %s
+    cursor.execute(query, (isbn,))
+    result = cursor.fetchone()  # Ottieni il primo risultato
+    cursor.close()
+    return result
+
+def aggiungi_prestito(mysql, isbn, username, data_inizio, data_fine):
+    cursor = mysql.connection.cursor()
+
+    # Verifica se il libro è disponibile (campo 'disponibile' è True)
+    query_check = "SELECT disponibile FROM Libro WHERE isbn = %s"
+    cursor.execute(query_check, (isbn,))
+    result = cursor.fetchone()
+
+    if result and result[0]:  # Se il libro è disponibile (True)
+        # Aggiungi il prestito
+        query_prestito = "INSERT INTO Prestito (isbn, utente, dataInizio, dataFine) VALUES (%s, %s, %s, %s)"
+        cursor.execute(query_prestito, (isbn, username, data_inizio, data_fine))
+
+        # Imposta la disponibilità del libro su False (non disponibile)
+        query_update = "UPDATE Libro SET disponibile = False WHERE isbn = %s"
+        cursor.execute(query_update, (isbn,))
+
+        # Conferma le modifiche
+        mysql.connection.commit()
+        cursor.close()
+        return True
+    else:
+        cursor.close()
+        print("Il libro non è disponibile.")
+        return False
+
+
+  
+def update_disponibilita(mysql, isbn):
+    cursor = mysql.connection.cursor()
+    query = "UPDATE Libro SET Disponibilità = 0 WHERE ISBN = %s"  # Corretto: cambia ? con %s
+    cursor.execute(query, (isbn,))
+    mysql.connection.commit()
+    cursor.close()
+    
+def getUserByUsername(mysql, username):
+    cursor = mysql.connection.cursor()
+    query = "SELECT * FROM Utente WHERE username = %s"
+    cursor.execute(query, (username,))
+    user = cursor.fetchone()  # Restituisce una riga se l'utente esiste
+    cursor.close()
+    return user
+
+def restituire_libro(mysql, isbn, username):
+    cursor = mysql.connection.cursor()
+    # Aggiorna la disponibilità del libro
+    query_libro = "UPDATE Libro SET disponibile = 1 WHERE isbn = %s"
+    cursor.execute(query_libro, (isbn,))
+
+    mysql.connection.commit()
+    cursor.close()
+    return True
+
+
+def get_prestiti_attivi_per_utente(mysql, username):
+    cursor = mysql.connection.cursor()
+    query = """
+        SELECT p.isbn, l.titolo, p.dataInizio, p.dataFine
+        FROM Prestito p
+        JOIN Libro l ON p.isbn = l.isbn
+        WHERE p.utente = %s AND p.dataFine >= CURDATE() AND l.disponibile = 0
+    """
+    cursor.execute(query, (username,))
+    prestiti = cursor.fetchall()
+    cursor.close()
+    return prestiti
+
+def elimina_prestito(mysql, isbn, username):
+    cursor = mysql.connection.cursor()
+    query = "DELETE FROM Prestito WHERE ISBN = %s AND utente = %s"
+    cursor.execute(query, (isbn, username))
+    mysql.connection.commit()
+    cursor.close()
+
+def aggiorna_disponibilita(mysql, isbn):
+    cursor = mysql.connection.cursor()
+    query = "UPDATE Libro SET disponibile = TRUE WHERE ISBN = %s"
+    cursor.execute(query, (isbn,))
+    mysql.connection.commit()
+    cursor.close()
+
+def get_prestito_by_isbn_and_user(mysql, isbn, username):
+    cursor = mysql.connection.cursor()
+    query = """
+        SELECT * FROM Prestito
+        WHERE ISBN = %s AND utente = %s AND dataFine >= CURDATE()
+    """
+    cursor.execute(query, (isbn, username))
+    prestito = cursor.fetchone()
+    cursor.close()
+    return prestito
+

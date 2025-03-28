@@ -1,7 +1,10 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
+from werkzeug.security import generate_password_hash, check_password_hash
 from flask_mysqldb import MySQL
 import db
 import json
+import re
+from datetime import timedelta
 
 app = Flask(__name__)
 app.secret_key = "super secret key"
@@ -13,6 +16,8 @@ app.config['MYSQL_USER'] = '5di'
 app.config['MYSQL_PASSWORD'] = 'colazzo'
 app.config['MYSQL_DB'] = 'digiacomo_berardi'
 mysql = MySQL(app)
+
+app.permanent_session_lifetime = timedelta(minutes=30)
 
 
 
@@ -27,6 +32,10 @@ def createAutore():
 @app.route("/createLibro/")
 def createLibro():
     return db.createLibro(mysql)
+
+@app.route("/createUtente/")
+def createUtente():
+    return db.createUtente(mysql)
 
 @app.route("/addLibro/",methods=["GET","POST"])
 def addLibro():
@@ -108,5 +117,154 @@ def autore(cf):
     else:
         return "Autore non trovato", 404
 
+@app.route("/registrati/", methods=["GET", "POST"])
+def registrati():
+    if request.method == "POST":
+        nome = request.form.get("nome")
+        cognome = request.form.get("cognome")
+        username = request.form.get("username")
+        password = request.form.get("password")
+        confirmPassword = request.form.get("confirmPassword")
+        ddn = request.form.get("ddn")
+
+        # Controllo validità password
+        errore_password = db.valida_password(re,password,confirmPassword)
+        if errore_password:
+            flash(errore_password)
+            return redirect(url_for("registrati"))
+
+        password_hash = generate_password_hash(password)
         
+        if(db.registrati(mysql,nome,cognome,username,password_hash,ddn)==False):
+            flash("Username già in uso, scegline un altro.")
+            return redirect(url_for("registrati"))
+        
+        flash("Registrazione completata con successo!")
+        return redirect(url_for("registrati"))
+    
+    return render_template("registrati.html")
+
+@app.route("/login/", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
+
+        user = db.getUserByUsername(mysql, username)
+        if user and check_password_hash(user[3], password):
+            session["user_id"] = user[0]
+            session["username"] = user[2]
+            flash(f"Benvenuto {username}!", "success")
+            return redirect(url_for("home"))
+        else:
+            flash("Username o password errati.", "danger")
+            return redirect(url_for("login"))
+    
+    return render_template("login.html")
+
+@app.route("/logout/")
+def logout():
+    session.pop("username", None)  # Rimuove l'utente dalla sessione
+    flash("Logout effettuato con successo!")
+    return redirect(url_for("home"))
+
+@app.route('/prestito/', methods=['GET', 'POST'])
+@app.route('/prestito/<isbn>', methods=['GET', 'POST'])
+def prestito(isbn=None):
+    # Verifica se l'utente è loggato, se non lo è, lo reindirizza alla pagina di login
+    if 'user_id' not in session:
+        flash("Devi essere loggato per fare un prestito.", "danger")
+        return redirect(url_for('login'))
+
+    if isbn:
+        # Se viene passato un ISBN, mostra il form per effettuare il prestito
+        libro = db.get_libro_by_isbn(mysql, isbn)  # Ottieni il libro con l'ISBN specificato
+        if not libro:
+            flash("Libro non trovato.", "danger")
+            return redirect(url_for('catalogo'))  # Se il libro non esiste, torna al catalogo
+
+        if request.method == 'POST':
+            # Preleva i dati dal form
+            username = session['username']  # Lo username dell'utente loggato
+            data_inizio = request.form['data_inizio']
+            data_fine = request.form['data_fine']
+
+            # Verifica che l'utente esista
+            utente = db.get_utente_by_username(mysql, username)
+            if not utente:
+                flash("Utente non trovato.", "danger")
+                return redirect(url_for('prestito', isbn=isbn))  # Se l'utente non esiste, ritorna alla pagina di prestito
+
+            # Aggiungi il prestito nel database
+            if db.aggiungi_prestito(mysql, isbn, username, data_inizio, data_fine):
+                flash("Prestito effettuato con successo.", "success")
+                return redirect(url_for('catalogo'))  # Dopo aver effettuato il prestito, reindirizza al catalogo
+
+        return render_template('prestito.html', libro=libro)
+
+    else:
+        # Se non viene passato un ISBN, mostra la lista dei prestiti attivi per l'utente
+        username = session['username']  # Lo username dell'utente loggato
+        prestiti = db.get_prestiti_attivi_per_utente(mysql, username)  # Funzione per ottenere i prestiti attivi
+
+        return render_template('prestito.html', prestiti=prestiti)
+    
+@app.route('/restituisci/<isbn>', methods=['POST'])
+def restituisci(isbn):
+    # Verifica se l'utente è loggato
+    if 'user_id' not in session:
+        flash("Devi essere loggato per restituire un libro.", "danger")
+        return redirect(url_for('login'))
+
+    # Restituisce il libro (annulla il prestito e aggiorna la disponibilità)
+    if db.restituire_libro(mysql, isbn, session['username']):
+        flash("Libro restituito con successo e stato aggiornato.", "success")
+    else:
+        flash("Errore nella restituzione del libro.", "danger")
+
+    return redirect(url_for('prestito'))  # Torna alla lista dei prestiti attivi
+    
+@app.route("/aggiungi_riassunto", methods=["POST"])
+def aggiungi_riassunto():
+    isbn = request.form.get("isbn")
+    titolo_riassunto = request.form.get("titoloRiassunto")
+    testo_riassunto = request.form.get("testoRiassunto")
+
+    # Verifica che tutti i campi siano presenti
+    if not isbn or not titolo_riassunto or not testo_riassunto:
+        return jsonify({"success": False, "message": "Tutti i campi devono essere compilati."})
+
+    # Aggiorna il riassunto nel database
+    cursor = mysql.connection.cursor()
+    query = """
+    UPDATE Libro 
+    SET titoloRiassunto = %s, riassunto = %s
+    WHERE ISBN = %s
+    """
+    try:
+        cursor.execute(query, (titolo_riassunto, testo_riassunto, isbn))
+        mysql.connection.commit()
+        cursor.close()
+        flash("Riassunto aggiunto con successo!")
+        return redirect(url_for('catalogo'))
+    except Exception as e:
+        mysql.connection.rollback()
+        cursor.close()
+        flash("Errore nell'aggiunta")
+        return redirect(url_for('catalogo'))
+
+
+@app.route("/get_riassunto/<isbn>", methods=["GET"])
+def get_riassunto(isbn):
+    cursor = mysql.connection.cursor()
+    query = "SELECT titoloRiassunto, riassunto FROM Libro WHERE ISBN = %s"
+    cursor.execute(query, (isbn,))
+    result = cursor.fetchone()
+    cursor.close()
+
+    if result:
+        return jsonify({'titolo': result[0], 'riassunto': result[1]})
+    else:
+        return jsonify({'titolo': None, 'riassunto': 'Riassunto non disponibile'})
+
 app.run(debug=True)

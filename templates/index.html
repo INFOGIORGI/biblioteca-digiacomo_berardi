@@ -8,6 +8,7 @@ Home
 {% endblock %}
 
 {% block corpo %}
+
 <div class="intro">
     <div class="container">
         <h2>Il nostro progetto PCTO: Una Biblioteca Digitale</h2>
@@ -16,6 +17,20 @@ Home
         <p>Inmatica, il nostro partner tecnologico, ci sta supportando con la sua esperienza nel mondo digitale e nella creazione di soluzioni web innovative. Insieme, stiamo costruendo una piattaforma che rappresenterà il futuro della gestione bibliotecaria.</p>
         <p>Esplora il nostro sito e segui il nostro progresso mentre continuiamo a lavorare per offrire un servizio migliore per tutti!</p>
     </div>
+</div>
+
+<br>
+
+<div class="flash-message-container">
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="flash-message">
+          {% for message in messages %}
+            <p>{{ message }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
 </div>
 
 {% endblock %}

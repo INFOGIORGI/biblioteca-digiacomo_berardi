@@ -8,10 +8,9 @@
 body {
     font-family: 'Arial', sans-serif;
     background-color: #fff;
-    /* Colore di sfondo bianco */
     color: #333;
-    /* Colore del testo principale */
     line-height: 1.6;
+    padding-bottom: 60px; /* Aggiungi spazio per il footer */
 }
 
 h1,
@@ -23,7 +22,7 @@ h3 {
 
 a {
     text-decoration: none;
-    color: #ffffff;
+    color: #000000;
     /* Colore dei link */
     transition: color 0.3s ease;
 }
@@ -157,9 +156,9 @@ table tr:last-child td:last-child {
     border-bottom-right-radius: 10px;
 }
 
+/* Footer fisso senza coprire i contenuti */
 footer {
     background-color: #000;
-    /* Sfondo footer nero */
     color: #fff;
     text-align: center;
     padding: 20px;
@@ -171,18 +170,17 @@ footer {
 
 .catalogo footer {
     background-color: #000;
-    /* Sfondo footer nero */
     color: #fff;
     text-align: center;
     padding: 20px;
-    position: absolute;
-    bottom: 0;
+    position: relative;
     width: 100%;
     box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
 }
 
-footer p {
-    margin: 0;
+/* Assicurati che il contenuto della pagina abbia abbastanza spazio per il footer */
+.container {
+    margin-bottom: 60px; /* Spazio per il footer */
 }
 
 /* Aggiusta l'input di ricerca al centro */
@@ -353,4 +351,135 @@ footer p {
     color: #000000;
     /* Colore dei link */
     transition: color 0.3s ease;
+}
+
+form input[type="text"],
+form input[type="password"],
+form input[type="date"] {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0 20px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.flash-message-container {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.flash-message {
+    background-color: #f4f4f9;
+    color: #000000;
+    padding: 10px;
+    border-radius: 5px;
+    display: inline-block;
+}
+
+/* Formattazione per la password e l'icona dell'occhio */
+.form-group {
+    position: relative; /* Necessario per posizionare l'icona sopra il campo */
+}
+
+.form-group input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0 20px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+}
+
+.form-group i {
+    position: absolute;
+    top: 30px;
+    right: 10px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #333;
+    transition: color 0.3s ease;
+}
+
+.form-group i:hover {
+    color: #3498db; /* Cambia colore quando hover */
+}
+
+.no-prestiti {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #ff6347; /* Colore rosso chiaro */
+    background-color: #f8d7da; /* Colore di sfondo chiaro */
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    margin-top: 20px;
+}
+
+/* Styling per l'icona del riassunto */
+.info-icon {
+    background-color: #ffffff;
+    color: white;
+    padding: 8px;
+    border-radius: 50%;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-left: 10px;
+    display: inline-block;
+}
+
+.info-icon:hover {
+    background-color: #000000;
+    /* Colore al passaggio del mouse */
+}
+
+/* Modale per il riassunto */
+.modal {
+    display: none; /* Nascondi la modale di default */
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4); /* Background scuro */
+    padding-top: 60px;
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: 5% auto;
+    padding: 20px;
+    border-radius: 10px;
+    width: 80%;
+    max-width: 500px;
+}
+
+.modal-header {
+    padding: 10px 0;
+    font-size: 1.5rem;
+    text-align: center;
+    background-color: #3498db;
+    color: white;
+    border-radius: 10px 10px 0 0;
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+.modal-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 2rem;
+    color: #3498db;
+    cursor: pointer;
+}
+
+.modal-close:hover {
+    color: #2980b9;
 }

@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block titolo %}
+Registrazione
+{% endblock %}
+
+{% block intestazione %}
+{% endblock %}
+
+{% block corpo %}
+<div class="container">
+    <form method="POST" action="{{ url_for('registrati') }}">
+        <h3>Nome</h3>
+        <input type="text" name="nome">
+        <h3>Cognome</h3>
+        <input type="text" name="cognome">
+        <h3>Username</h3>
+        <input type="text" name="username">
+        
+        <h3>Password <i class="fas fa-eye" id="togglePassword"></i></h3>
+        <input type="password" name="password" id="password">
+        
+        <h3>Conferma password <i class="fas fa-eye" id="toggleConfirmPassword"></i></h3>
+        <input type="password" name="confirmPassword" id="confirmPassword">
+        
+        <h3>Data di nascita</h3>
+        <input type="date" name="ddn">
+        <br><br>
+        <input type="submit" value="Registrati">
+    </form>
+
+    <div class="flash-message-container">
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <div class="flash-message">
+              {% for message in messages %}
+                <p>{{ message }}</p>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+    </div>
+</div>
+
+<script>
+    const togglePassword = document.getElementById('togglePassword');
+    const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
+    const passwordField = document.getElementById('password');
+    const confirmPasswordField = document.getElementById('confirmPassword');
+
+    togglePassword.addEventListener('click', function () {
+        const type = passwordField.type === 'password' ? 'text' : 'password';
+        passwordField.type = type;
+        this.classList.toggle('fa-eye-slash');
+    });
+
+    toggleConfirmPassword.addEventListener('click', function () {
+        const type = confirmPasswordField.type === 'password' ? 'text' : 'password';
+        confirmPasswordField.type = type;
+        this.classList.toggle('fa-eye-slash');
+    });
+</script>
+
+{% endblock %}
