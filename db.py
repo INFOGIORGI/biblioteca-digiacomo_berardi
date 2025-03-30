@@ -28,7 +28,7 @@ def createLibro(mysql):
         Prezzo float(2), 
         Locazione varchar(20), 
         Autore varchar(16), 
-        Disponibilità boolean,
+        Disponibile boolean DEFAULT true,
         titoloRiassunto varchar(20),
         riassunto varchar(1000),
         
@@ -92,7 +92,7 @@ def addLibro(mysql,isbn,titolo,genere,prezzo,locazione,autore):
     prezzo = None if prezzo == "" else prezzo
     
     query = """
-    INSERT INTO Libro 
+    INSERT INTO Libro (ISBN, Titolo, Genere, Prezzo, Locazione, Autore)
     VALUES (%s,%s,%s,%s,%s,%s)
     """
     
@@ -126,6 +126,7 @@ def addAutore(mysql,nome,cognome,cf,ddn,ddm):
 
 def catalogo(mysql,query, params):
     cursor = mysql.connection.cursor()
+    query += " JOIN Autore ON Libro.Autore = Autore.CF"
     cursor.execute(query, params)
     libri = cursor.fetchall()
     cursor.close()
@@ -264,7 +265,7 @@ def aggiungi_prestito(mysql, isbn, username, data_inizio, data_fine):
   
 def update_disponibilita(mysql, isbn):
     cursor = mysql.connection.cursor()
-    query = "UPDATE Libro SET Disponibilità = 0 WHERE ISBN = %s"  # Corretto: cambia ? con %s
+    query = "UPDATE Libro SET Disponibilità = 0 WHERE ISBN = %s"
     cursor.execute(query, (isbn,))
     mysql.connection.commit()
     cursor.close()

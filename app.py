@@ -169,14 +169,14 @@ def logout():
 def prestito(isbn=None):
     # Verifica se l'utente è loggato, se non lo è, lo reindirizza alla pagina di login
     if 'user_id' not in session:
-        flash("Devi essere loggato per fare un prestito.", "danger")
+        flash("Devi essere loggato per fare un prestito.")
         return redirect(url_for('login'))
 
     if isbn:
         # Se viene passato un ISBN, mostra il form per effettuare il prestito
         libro = db.get_libro_by_isbn(mysql, isbn)  # Ottieni il libro con l'ISBN specificato
         if not libro:
-            flash("Libro non trovato.", "danger")
+            flash("Libro non trovato.",)
             return redirect(url_for('catalogo'))  # Se il libro non esiste, torna al catalogo
 
         if request.method == 'POST':
