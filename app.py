@@ -2,13 +2,11 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_mysqldb import MySQL
 import db
-import json
 import re
 from datetime import timedelta
 
 app = Flask(__name__)
 app.secret_key = "super secret key"
-
 
 app.config['MYSQL_HOST'] = '138.41.20.102'
 app.config['MYSQL_PORT'] = 53306
@@ -18,8 +16,6 @@ app.config['MYSQL_DB'] = 'digiacomo_berardi'
 mysql = MySQL(app)
 
 app.permanent_session_lifetime = timedelta(minutes=30)
-
-
 
 @app.route("/")
 def home():
@@ -196,10 +192,12 @@ def prestito(isbn=None):
                 return redirect(url_for('prestito', isbn=isbn))  # Se l'utente non esiste, ritorna alla pagina di prestito
 
             # Aggiungi il prestito nel database
-            if db.aggiungi_prestito(mysql, isbn, username, data_inizio, data_fine):
+            if db.aggiungi_prestito(mysql, isbn, username, data_inizio, data_fine) == True:
                 flash("Prestito effettuato con successo.", "success")
                 return redirect(url_for('catalogo'))  # Dopo aver effettuato il prestito, reindirizza al catalogo
-
+            else:
+                flash("Errore nell'aggiunta")
+                
         return render_template('prestito.html', libro=libro)
 
     else:
@@ -217,7 +215,7 @@ def restituisci(isbn):
         return redirect(url_for('login'))
 
     # Restituisce il libro (annulla il prestito e aggiorna la disponibilità)
-    if db.restituire_libro(mysql, isbn, session['username']):
+    if db.restituire_libro(mysql, isbn):
         flash("Libro restituito con successo e stato aggiornato.", "success")
     else:
         flash("Errore nella restituzione del libro.", "danger")
@@ -230,37 +228,17 @@ def aggiungi_riassunto():
     titolo_riassunto = request.form.get("titoloRiassunto")
     testo_riassunto = request.form.get("testoRiassunto")
 
-    # Verifica che tutti i campi siano presenti
-    if not isbn or not titolo_riassunto or not testo_riassunto:
-        return jsonify({"success": False, "message": "Tutti i campi devono essere compilati."})
-
-    # Aggiorna il riassunto nel database
-    cursor = mysql.connection.cursor()
-    query = """
-    UPDATE Libro 
-    SET titoloRiassunto = %s, riassunto = %s
-    WHERE ISBN = %s
-    """
-    try:
-        cursor.execute(query, (titolo_riassunto, testo_riassunto, isbn))
-        mysql.connection.commit()
-        cursor.close()
+    if(db.aggiornaRiassunto(mysql,titolo_riassunto,testo_riassunto,isbn) == True):
         flash("Riassunto aggiunto con successo!")
         return redirect(url_for('catalogo'))
-    except Exception as e:
-        mysql.connection.rollback()
-        cursor.close()
-        flash("Errore nell'aggiunta")
-        return redirect(url_for('catalogo'))
+    
+    flash("Errore nell'aggiunta")
+    return redirect(url_for('catalogo'))
 
 
 @app.route("/get_riassunto/<isbn>", methods=["GET"])
 def get_riassunto(isbn):
-    cursor = mysql.connection.cursor()
-    query = "SELECT titoloRiassunto, riassunto FROM Libro WHERE ISBN = %s"
-    cursor.execute(query, (isbn,))
-    result = cursor.fetchone()
-    cursor.close()
+    result = db.getRiassunto(mysql, isbn)
 
     if result:
         return jsonify({'titolo': result[0], 'riassunto': result[1]})

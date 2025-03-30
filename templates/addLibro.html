@@ -16,17 +16,17 @@ Aggiungi libro
 
 <form action="/addLibro/" method="POST">
     <h3>ISBN</h3>
-    <input type="text" name="isbn">
+    <input type="text" name="isbn" required>
     <h3>Titolo</h3>
-    <input type="text" name="titolo">
+    <input type="text" name="titolo" required>
     <h3>Genere</h3>
-    <input type="text" name="genere">
+    <input type="text" name="genere" required>
     <h3>Prezzo</h3>
     <input type="number" name="prezzo">
     <h3>Locazione</h3>
     <input type="text" name="locazione">
     <h3>Autore</h3>
-    <input type="text" name="autore">
+    <input type="text" name="autore" required>
     <br>
     <br>
     <input type="submit" value="Aggiungi">

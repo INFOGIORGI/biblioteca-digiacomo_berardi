@@ -31,11 +31,11 @@ Catalogo
 <table>
     <tr>
         <th>ISBN</th>
-        <th><a href="{{ url_for('catalogo', order_by='Titolo') }}", style="color: rgb(255, 255, 255)">Titolo</a></th>
+        <th><a href="{{ url_for('catalogo', order_by='Titolo') }}" , style="color: rgb(255, 255, 255)">Titolo</a></th>
         <th>Genere</th>
         <th>Prezzo</th>
         <th>Locazione</th>
-        <th><a href="{{ url_for('catalogo', order_by='Autore') }}", style="color: rgb(255, 255, 255)";>Autore</a></th>
+        <th><a href="{{ url_for('catalogo', order_by='Autore') }}" , style="color: rgb(255, 255, 255)" ;>Autore</a></th>
         <th>Disponibilità</th>
         <th>Riassunto</th>
     </tr>
@@ -75,10 +75,11 @@ Catalogo
         <form id="formRiassunto" style="display:none;" method="POST" action="/aggiungi_riassunto">
             <input type="hidden" id="isbnRiassunto" name="isbn">
             <label for="titoloRiassunto">Titolo:</label>
-            <input type="text" id="titoloRiassunto" name="titoloRiassunto" placeholder="Inserisci titolo del riassunto"
-                required>
+            <input type="text" id="titoloRiassunto" name="titoloRiassunto" placeholder="Inserisci titolo del riassunto" required>
             <label for="testoRiassunto">Riassunto:</label>
+            <br>
             <textarea id="testoRiassunto" name="testoRiassunto" rows="5" required></textarea>
+            <br>
             <button type="submit">Salva Riassunto</button>
         </form>
     </div>

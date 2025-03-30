@@ -219,10 +219,27 @@ def get_libro_by_isbn(mysql, isbn):
     cursor.close()
     return result
 
+from datetime import datetime
+
 def aggiungi_prestito(mysql, isbn, username, data_inizio, data_fine):
     cursor = mysql.connection.cursor()
 
-    # Verifica se il libro è disponibile (campo 'disponibile' è True)
+    # Converti le date in oggetti datetime per il confronto
+    try:
+        data_inizio_dt = datetime.strptime(data_inizio, "%Y-%m-%d")
+        data_fine_dt = datetime.strptime(data_fine, "%Y-%m-%d")
+    except ValueError:
+        cursor.close()
+        print("Formato data non valido.")
+        return False
+
+    # Verifica che la data di fine sia successiva alla data di inizio
+    if data_fine_dt <= data_inizio_dt:
+        cursor.close()
+        print("Errore: La data di fine deve essere successiva alla data di inizio.")
+        return False
+
+    # Verifica se il libro è disponibile
     query_check = "SELECT disponibile FROM Libro WHERE isbn = %s"
     cursor.execute(query_check, (isbn,))
     result = cursor.fetchone()
@@ -232,7 +249,7 @@ def aggiungi_prestito(mysql, isbn, username, data_inizio, data_fine):
         query_prestito = "INSERT INTO Prestito (isbn, utente, dataInizio, dataFine) VALUES (%s, %s, %s, %s)"
         cursor.execute(query_prestito, (isbn, username, data_inizio, data_fine))
 
-        # Imposta la disponibilità del libro su False (non disponibile)
+        # Imposta la disponibilità del libro su False
         query_update = "UPDATE Libro SET disponibile = False WHERE isbn = %s"
         cursor.execute(query_update, (isbn,))
 
@@ -244,8 +261,6 @@ def aggiungi_prestito(mysql, isbn, username, data_inizio, data_fine):
         cursor.close()
         print("Il libro non è disponibile.")
         return False
-
-
   
 def update_disponibilita(mysql, isbn):
     cursor = mysql.connection.cursor()
@@ -262,7 +277,7 @@ def getUserByUsername(mysql, username):
     cursor.close()
     return user
 
-def restituire_libro(mysql, isbn, username):
+def restituire_libro(mysql, isbn):
     cursor = mysql.connection.cursor()
     # Aggiorna la disponibilità del libro
     query_libro = "UPDATE Libro SET disponibile = 1 WHERE isbn = %s"
@@ -311,3 +326,29 @@ def get_prestito_by_isbn_and_user(mysql, isbn, username):
     cursor.close()
     return prestito
 
+def aggiornaRiassunto(mysql,titolo_riassunto,testo_riassunto,isbn):
+    # Aggiorna il riassunto nel database
+    cursor = mysql.connection.cursor()
+    query = """
+    UPDATE Libro 
+    SET titoloRiassunto = %s, riassunto = %s
+    WHERE ISBN = %s
+    """
+    try:
+        cursor.execute(query, (titolo_riassunto, testo_riassunto, isbn))
+        mysql.connection.commit()
+        cursor.close()
+        return True
+    except Exception as e:
+        mysql.connection.rollback()
+        cursor.close()
+        return False
+    
+def getRiassunto(mysql, isbn):
+    cursor = mysql.connection.cursor()
+    query = "SELECT titoloRiassunto, riassunto FROM Libro WHERE ISBN = %s"
+    cursor.execute(query, (isbn,))
+    result = cursor.fetchone()
+    cursor.close()
+    
+    return result

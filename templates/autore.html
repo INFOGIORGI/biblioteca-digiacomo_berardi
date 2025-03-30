@@ -9,7 +9,7 @@ Dettagli Autore
 
 {% block corpo %}
     <div class="intro">
-        <h2>Autore: {{ autore[1] }} {{ autore[2] }}</h2>
+        <h2>Autore: {{ autore[0] }} {{ autore[1] }} {{ autore[2] }}</h2>
         <p><strong>Data di Nascita:</strong> {{ autore[3] }}</p>
         <p><strong>Data di Morte:</strong> {% if autore[4] %} {{ autore[4] }} {% else %} Vivo {% endif %}</p>
     </div>
