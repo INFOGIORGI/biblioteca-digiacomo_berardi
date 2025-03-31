@@ -170,7 +170,7 @@ def filtraGenere(parametri,genere):
     return query
             
 def addFiltro(query):
-    query = " WHERE LOWER(Titolo) LIKE %s OR LOWER(Autore) LIKE %s OR ISBN LIKE %s"
+    query = " WHERE LOWER(Titolo) LIKE %s OR LOWER(Autore) LIKE %s OR ISBN LIKE %s OR LOWER(Nome) LIKE %s OR LOWER(Cognome) LIKE %s OR LOWER(CONCAT(Nome, ' ', Cognome)) LIKE %s"
     return query
 
 def valida_password(re,password,confirmPassword):

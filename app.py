@@ -97,7 +97,7 @@ def catalogo():
         if filtro:
             query += db.addFiltro(query)
             param_filtro = f"%{filtro.lower()}%" #doppia percentuale cerca il filtro in mezzo ad altre parole 
-            libriFiltrati = db.catalogo(mysql, query, (param_filtro, param_filtro, param_filtro))
+            libriFiltrati = db.catalogo(mysql, query, (param_filtro, param_filtro, param_filtro, param_filtro, param_filtro, param_filtro))
         else:
             libriFiltrati = db.catalogo(mysql)
             
