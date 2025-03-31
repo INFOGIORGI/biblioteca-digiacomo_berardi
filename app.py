@@ -35,7 +35,11 @@ def createUtente():
 
 @app.route("/addLibro/",methods=["GET","POST"])
 def addLibro():
-    if request.method == 'GET': 
+    if 'user_id' not in session:
+        flash("Devi essere loggato aggiungere un libro.", "danger")
+        return redirect(url_for('login'))
+        
+    if request.method == 'GET':
         return render_template("addLibro.html",titolo="AddLibro")
     else:
         isbn = request.form.get("isbn",)

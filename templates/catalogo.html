@@ -35,7 +35,7 @@ Catalogo
         <th>Genere</th>
         <th>Prezzo</th>
         <th>Locazione</th>
-        <th><a href="{{ url_for('catalogo', order_by='Autore') }}" , style="color: rgb(255, 255, 255)" ;>Autore</a></th>
+        <th><a href="{{ url_for('catalogo', order_by='Cognome') }}" , style="color: rgb(255, 255, 255)" ;>Autore</a></th>
         <th>Disponibilità</th>
         <th>Riassunto</th>
     </tr>
@@ -46,10 +46,10 @@ Catalogo
         <td>{{ libro[2] }}</td>
         <td>{{ libro[3] }}</td>
         <td>{{ libro[4] }}</td>
-        <td><a href="{{ url_for('autore', cf=libro[5]) }}">{{ libro[9] }} {{ libro[10] }}</a></td>
+        <td><a href="{{ url_for('autore', cf=libro[5]) }}">{{ libro[10] }} {{ libro[9] }}</a></td>
         <td>
             {% if libro[6] == 1 %}
-            {% if session.get('user_id') %}
+            {% if 'username' in session %}
             <a href="{{ url_for('prestito', isbn=libro[0]) }}" style="color: green;">Disponibile</a>
             {% else %}
             <span style="color: green;">Disponibile</span>
