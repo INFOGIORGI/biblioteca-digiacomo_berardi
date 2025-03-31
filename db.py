@@ -28,7 +28,7 @@ def createLibro(mysql):
         Prezzo float(2), 
         Locazione varchar(20), 
         Autore varchar(16), 
-        Disponibile boolean DEFAULT true,
+        disponibile boolean DEFAULT true,
         titoloRiassunto varchar(20),
         riassunto varchar(1000),
         
@@ -57,7 +57,7 @@ def createUtente(mysql):
         """
     
     cursor.execute(query)
-    cursor.close
+    cursor.close()
     
 def createPrestito(mysql):
     cursor = mysql.connection.cursor()
@@ -77,7 +77,7 @@ def createPrestito(mysql):
         """
     
     cursor.execute(query)
-    cursor.close
+    cursor.close()
 
 def addLibro(mysql,isbn,titolo,genere,prezzo,locazione,autore):
     cursor = mysql.connection.cursor()
@@ -126,11 +126,11 @@ def addAutore(mysql,nome,cognome,cf,ddn,ddm):
 
 def catalogo(mysql,query, params):
     cursor = mysql.connection.cursor()
-    query += " JOIN Autore ON Libro.Autore = Autore.CF"
     cursor.execute(query, params)
     libri = cursor.fetchall()
+    
     cursor.close()
-    return libri
+    return libri 
 
 def getGeneri(mysql):
     query_generi = "SELECT DISTINCT Genere FROM Libro"
@@ -157,7 +157,7 @@ def getLibriAutore(mysql,cf):
     return libri_autore
 
 def addQuery():
-    query = "SELECT * FROM Libro" 
+    query = "SELECT * FROM Libro JOIN Autore ON Libro.Autore = Autore.CF" 
     return query
 
 def addOrdinamento(order_by):
@@ -208,7 +208,7 @@ def get_utente_by_username(mysql, username):
 
 def get_utente_by_cf(mysql, cf):
     cursor = mysql.connection.cursor()
-    query = "SELECT * FROM Utenti WHERE CF = ?"
+    query = "SELECT * FROM Utente WHERE CF = %s"
     result = cursor.execute(query, (cf,))
     return result[0] if result else None
 
@@ -265,7 +265,7 @@ def aggiungi_prestito(mysql, isbn, username, data_inizio, data_fine):
   
 def update_disponibilita(mysql, isbn):
     cursor = mysql.connection.cursor()
-    query = "UPDATE Libro SET Disponibilità = 0 WHERE ISBN = %s"
+    query = "UPDATE Libro SET disponibile = 0 WHERE ISBN = %s"
     cursor.execute(query, (isbn,))
     mysql.connection.commit()
     cursor.close()

@@ -46,7 +46,7 @@ Catalogo
         <td>{{ libro[2] }}</td>
         <td>{{ libro[3] }}</td>
         <td>{{ libro[4] }}</td>
-        <td><a href="{{ url_for('autore', cf=libro[5]) }}">{{ libro[9] }} {{ libro[11] }}</a></td>
+        <td><a href="{{ url_for('autore', cf=libro[5]) }}">{{ libro[9] }} {{ libro[10] }}</a></td>
         <td>
             {% if libro[6] == 1 %}
             {% if session.get('user_id') %}
